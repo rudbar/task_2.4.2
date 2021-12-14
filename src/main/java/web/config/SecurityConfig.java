@@ -32,17 +32,111 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.loginSuccessHandler = loginSuccessHandler;
     }
 
+    @Autowired
+    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder()); // конфигурация для прохождения аутентификации
+    }
+//
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.authenticationProvider(authenticationProvider());
+//    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/authenticated/**").authenticated()
+
+        http.formLogin()
+//                .loginPage("/login")
+                .successHandler(loginSuccessHandler)
+                .loginProcessingUrl("/login")
+                .usernameParameter("j_username")
+                .passwordParameter("j_password")
+                // даем доступ к форме логина всем
+                .permitAll();
+
+        http.logout()
+                // разрешаем делать логаут всем
+                .permitAll()
+                // указываем URL логаута
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                //выклчаем кроссдоменную секьюрность (на этапе обучения неважна)
+                .and().csrf().disable();
+
+        http
+                // делаем страницу регистрации недоступной для авторизированных пользователей
+                .authorizeRequests()
+                //страницы аутентификаци доступна всем
+                .antMatchers("/login").anonymous()
+                // защищенные URL
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                .and()
-                .formLogin()
-                .and()
-                .logout().logoutSuccessUrl("/");
+                .anyRequest().authenticated();
+
+//        http.authorizeRequests()
+//                .antMatchers("/admin/**").authenticated()
+//                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .antMatchers("/user/**").authenticated()
+//                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+//                .and()
+//                .formLogin()
+//                .successHandler(loginSuccessHandler)
+//                .and()
+//                .logout().logoutSuccessUrl("/");
+
+
+
+//        http.authorizeRequests()
+//                .antMatchers("/login").anonymous()
+//                .antMatchers("/authenticated/**").authenticated()
+//                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+//                .and()
+//                .formLogin()
+//                .loginPage("/login/login")
+//                .successHandler(loginSuccessHandler)
+//                .loginProcessingUrl("/login/login")
+//                .permitAll()
+//                .and()
+//                .logout()
+//                .permitAll()
+//                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//                .logoutSuccessUrl("/login/login?logout")
+//                .and().csrf().disable();
     }
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.formLogin()
+//                // указываем страницу с формой логина
+//                .loginPage("/login")
+//                //указываем логику обработки при логине
+//                .successHandler(new LoginSuccessHandler())
+//                // указываем action с формы логина
+//                .loginProcessingUrl("/login")
+//                // Указываем параметры логина и пароля с формы логина
+//                .usernameParameter("j_username")
+//                .passwordParameter("j_password")
+//                // даем доступ к форме логина всем
+//                .permitAll();
+//
+//        http.logout()
+//                // разрешаем делать логаут всем
+//                .permitAll()
+//                // указываем URL логаута
+//                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//                // указываем URL при удачном логауте
+//                .logoutSuccessUrl("/login?logout")
+//                //выклчаем кроссдоменную секьюрность (на этапе обучения неважна)
+//                .and().csrf().disable();
+//
+//        http
+//                // делаем страницу регистрации недоступной для авторизированных пользователей
+//                .authorizeRequests()
+//                //страницы аутентификаци доступна всем
+//                .antMatchers("/login").anonymous()
+//                // защищенные URL
+//                .antMatchers("/hello").access("hasAnyRole('ADMIN')").anyRequest().authenticated();
+//    }
 
 //    @Bean
 //    public DaoAuthenticationProvider daoAuthenticationProvider() {
@@ -52,30 +146,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        return authenticationProvider;
 //    }
 
-    @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder()); // конфигурация для прохождения аутентификации
-    }
+//    @Autowired
+//    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder()); // конфигурация для прохождения аутентификации
+//    }
 
     @Bean
     public static NoOpPasswordEncoder passwordEncoder() {
         return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
     }
 
-//    @Bean
-//    public UserDetailsService users() {
-//        UserDetails user = User.builder()
-//                .username("user")
-//                .password("{bcrypt}$2a$12$mrWA64irC2mnADV3Etfs4eFGZcXoXBaYYdH/G.19FaZSv6KtWdmu6")
-//                .roles("USER")
-//                .build();
-//        UserDetails admin = User.builder()
-//                .username("admin")
-//                .password("{bcrypt}$2a$12$mrWA64irC2mnADV3Etfs4eFGZcXoXBaYYdH/G.19FaZSv6KtWdmu6")
-//                .roles("ADMIN", "USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
+
 
 
 

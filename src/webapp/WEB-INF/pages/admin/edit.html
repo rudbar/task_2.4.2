@@ -16,7 +16,18 @@
     <input type="text" th:field="*{email}" id="email"/>
     <br/>
 
+    Admin
+    <input type="checkbox" th:value="ROLE_ADMIN" th:name="roles">
+    <br/>
+    User
+    <input type="checkbox" th:value="ROLE_USER" th:name="roles">
+    <br/>
+
     <input type="submit" value="Update!"/>
+</form>
+
+<form th:action="@{/logout}" method="get">
+    <input type="submit" value="Logout" />
 </form>
 
 </body>

@@ -12,5 +12,9 @@
 <p th:text="${userRoles}"></p>
 
 <span sec:authentication="principal.authorities"></span>
+
+<form th:action="@{/logout}" method="get">
+    <input type="submit" value="Logout" />
+</form>
 </body>
 </html>

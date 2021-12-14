@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -17,13 +16,17 @@
     <br/>
 
     Admin
-    <input type="checkbox" th:name="rolesFromCheckBox" th:value="ROLE_ADMIN">
+    <input type="checkbox" th:value="ROLE_ADMIN" th:name="roles">
     <br/>
     User
-    <input type="checkbox" th:value="ROLE_USER" th:name="rolesFromCheckBox">
+    <input type="checkbox" th:value="ROLE_USER" th:name="roles">
     <br/>
 
     <input type="submit" value="Create!"/>
+</form>
+
+<form th:action="@{/logout}" method="get">
+    <input type="submit" value="Logout" />
 </form>
 
 </body>

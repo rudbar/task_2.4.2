@@ -35,7 +35,7 @@ public class UserController {
 
 	@GetMapping("/")
 	public String homePage() {
-		return "home";
+		return "login";
 	}
 
 	@GetMapping("/authenticated")
@@ -73,11 +73,14 @@ public class UserController {
 	@PostMapping()
 	public String createNewUserPageForAdmin(Principal principal,
 											@ModelAttribute("user") User user,
-											@RequestParam(value = "rolesFromCheckBox") String[] rolesFromCheckBox) {
+											Model model,
+											@RequestParam(required = false) String[] roles) {
+
 		Set<Role> roleSet = new HashSet<>();
-		for (String role : rolesFromCheckBox) {
+		for (String role : roles) {
 			roleSet.add(roleService.getRoleByName(role));
 		}
+
 		user.setRoles(roleSet);
 		userService.addUser(user);
 		return "redirect:/admin/main";
@@ -90,7 +93,15 @@ public class UserController {
 	}
 
 	@PatchMapping("/admin/{id}")
-	public String updateUserPageForAdmin(Principal principal, @ModelAttribute("user") User user, @PathVariable("id") Long id) {
+	public String updateUserPageForAdmin(Principal principal,
+										 @ModelAttribute("user") User user,
+										 @PathVariable("id") Long id,
+										 @RequestParam(required = false) String[] roles) {
+		Set<Role> roleSet = new HashSet<>();
+		for (String role : roles) {
+			roleSet.add(roleService.getRoleByName(role));
+		}
+		user.setRoles(roleSet);
 		userService.editUser(user);
 		return "redirect:/admin/main";
 	}
